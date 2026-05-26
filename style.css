@@ -1,0 +1,88 @@
+/* Kustomisasi khusus untuk Latar Belakang / Pendahuluan */
+.latar-belakang {
+  background-color: #ffffff; /* Latar belakang putih bersih */
+  padding: 25px 30px; /* Jarak ruang di dalam kotak */
+  border-left: 5px solid #1a365d; /* Garis aksen biru gelap di kiri */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Efek bayangan lembut */
+  margin-bottom: 30px; /* Jarak dengan elemen di bawahnya */
+  border-radius: 8px; /* Membuat sudut kotak sedikit melengkung */
+}
+
+/* Mengatur teks paragraf di dalam latar belakang */
+.latar-belakang p {
+  text-align: justify; /* Teks rata kanan-kiri */
+  font-size: 16px; /* Ukuran huruf standar laporan */
+  line-height: 1.8; /* Jarak antar baris agar tidak sumpek */
+  color: #333333; /* Warna abu-abu gelap agar nyaman di mata */
+  margin-bottom: 15px; /* Jarak antar paragraf */
+}
+
+/* Menghilangkan jarak ekstra di paragraf terakhir agar kotak tetap rapi */
+.latar-belakang p:last-child {
+  margin-bottom: 0;
+}
+/* Mengatur font dan warna latar belakang seluruh dokumen */
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #2c3e50;
+  background-color: #fafafa;
+}
+
+/* Mengubah warna Judul Bab (Heading 1 dan Heading 2) menjadi Biru Gelap */
+h1, h2 {
+  color: #1a365d;
+}
+
+/* Membuat tampilan tabel data lebih rapi dan profesional */
+table {
+  width: 100%;
+  margin: 20px 0;
+  border-collapse: collapse;
+}
+
+th {
+  background-color: #1a365d; 
+  color: white;
+  padding: 10px;
+}
+
+td {
+  padding: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+tr:nth-child(even) {
+  background-color: #f7fafc; /* Baris selang-seling abu-abu tipis */
+}
+
+/* Mengatur font, ukuran, dan perataan teks untuk SEMUA paragraf di laporan */
+p {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 16px; /* Menyamakan ukuran teks menjadi 16px */
+  line-height: 1.8; /* Menyamakan jarak antar baris */
+  color: #333333; /* Warna abu-abu gelap yang nyaman di mata */
+  text-align: justify; /* Membuat semua teks otomatis rata kanan-kiri */
+  margin-bottom: 15px; /* Jarak antar paragraf */
+}
+
+/*  3. BINGKAI LUAR UNTUK SELURUH HALAMAN LAPORAN  */
+.main-container {
+  /* Mengatur garis tepi luar: ketebalan 1px, tipe solid (garis lurus), warna abu-abu kebiruan */
+  border: 1px solid #b0c4de; 
+  
+  /* Memberikan jarak antara teks laporan dengan garis tepi luar */
+  padding: 40px !important; 
+  
+  /* Memberikan jarak antara garis tepi dengan ujung layar browser */
+  margin-top: 30px;
+  margin-bottom: 30px;
+  
+  /* Membuat sudut bingkai luar sedikit melengkung agar elegan */
+  border-radius: 8px; 
+  
+  /* Memberikan efek bayangan tipis pada bingkai halaman */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+  
+  /* Memastikan warna latar belakang di dalam bingkai adalah putih bersih */
+  background-color: #ffffff; 
+}

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Diska Listiana (M0725034)" />
+
+<meta name="date" content="2026-05-26" />
+
+<title>Integrasi Visualisasi Data, Uji Statistik Kruskal Wallis, dan Korelasi Spearman dalam Analisis Performa Kategori serta Penetapan Harga pada Database Sakila</title>
+
+<script src="TUGAS_ANALISIS_SAKILA_files/header-attrs-2.30/header-attrs.js"></script>
+<script src="TUGAS_ANALISIS_SAKILA_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="TUGAS_ANALISIS_SAKILA_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="TUGAS_ANALISIS_SAKILA_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="TUGAS_ANALISIS_SAKILA_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="TUGAS_ANALISIS_SAKILA_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="TUGAS_ANALISIS_SAKILA_files/navigation-1.1/tabsets.js"></script>
+<link href="TUGAS_ANALISIS_SAKILA_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="TUGAS_ANALISIS_SAKILA_files/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Integrasi Visualisasi Data, Uji Statistik
+Kruskal Wallis, dan Korelasi Spearman dalam Analisis Performa Kategori
+serta Penetapan Harga pada Database Sakila</h1>
+<h4 class="author">Diska Listiana (M0725034)</h4>
+<h4 class="date">2026-05-26</h4>
+
+</div>
+
+
+<div id="pendahuluan" class="section level1">
+<h1>1. Pendahuluan</h1>
+<div class="latar-belakang">
+<p>Industri penyewaan media hiburan, seperti halnya bisnis penyewaan
+film, dihadapkan pada perputaran data operasional yang masif setiap
+harinya. Dalam lanskap bisnis modern, pengelolaan data tidak sekadar
+berfungsi sebagai pencatatan administratif, melainkan menjadi aset
+strategis untuk mendukung pengambilan keputusan berbasis bukti
+<em>(data-driven decision making)</em>. Untuk memahami kompleksitas
+operasional ini, penggunaan sample database seperti Sakila yang
+disediakan oleh MySQL menjadi sangat relevan. Database relasional ini
+secara komprehensif merepresentasikan model bisnis penyewaan film di
+dunia nyata, mencakup pengelolaan inventaris, profil pelanggan, riwayat
+transaksi pembayaran, hingga variasi produk yang saling terhubung,
+sehingga memungkinkan analisis bisnis yang mendalam dan terukur.</p>
+<p>Langkah awal dalam mengevaluasi kinerja bisnis adalah
+mengidentifikasi performa penjualan pada tingkat kategori produk.
+Informasi ini terekam dalam tabel <em>(sales_by_film_category)</em> di
+database Sakila. Namun, memahami pola dari sekumpulan data mentah
+numerik merupakan suatu tantangan. Oleh karena itu, pendekatan
+visualisasi data eksploratif, khususnya melalui perancangan bar chart,
+menjadi metode yang krusial. Melalui representasi visual ini, distribusi
+total penjualan dari 16 kategori film dapat dipetakan secara jelas. Hal
+ini tidak hanya memfasilitasi identifikasi kategori produk unggulan
+<em>(top performer)</em> yang menjadi motor utama pendapatan, tetapi
+juga membantu manajemen dalam menyoroti kategori dengan performa
+suboptimal yang memerlukan evaluasi strategi pemasaran atau
+restrukturisasi inventaris.</p>
+<p>Lebih jauh dari sekadar evaluasi makro melalui penjualan, penetapan
+kebijakan harga <em>(pricing strategy)</em> di tingkat mikro menuntut
+analisis yang lebih spesifik. Dalam sistem database Sakila, tarif sewa
+film <em>(price)</em> dikelompokkan dalam tiga tingkatan harga nominal
+yang diskret: $0.99, $2.99, dan $4.99. Secara konseptual, muncul dugaan
+apakah penentuan harga ini berkorelasi dengan karakteristik fisik
+komoditas, khususnya durasi tayang film <em>(length)</em>. Apakah film
+berdurasi lebih panjang secara logis ditawarkan dengan harga sewa yang
+lebih tinggi, atau apakah strategi penentuan harga tersebut ditetapkan
+berdasarkan kriteria independen lainnya di luar durasi? Mengandalkan
+interpretasi visual semata tidaklah cukup untuk menjawab pertanyaan
+asosiatif ini secara ilmiah.</p>
+<p>Guna menjawab hipotesis tersebut dengan presisi analitik, diperlukan
+penerapan metode statistik inferensial. Mengingat struktur data price
+yang berwujud kategorik ordinal dan sebaran data <em>length</em> yang
+umumnya tidak memenuhi asumsi normalitas ketat, pendekatan
+non-parametrik menjadi pilihan yang tepat. Pertama, Uji Kruskal-Wallis
+diimplementasikan sebagai metode komparatif untuk membuktikan keberadaan
+perbedaan signifikan pada median durasi film di antara ketiga kelompok
+harga sewa. Kedua, untuk mendalami sifat hubungannya, Uji Korelasi
+Spearman dilakukan guna mengukur arah dan signifikansi hubungan linear
+antara durasi tayang dengan besaran tarif sewa. Integrasi antara
+eksplorasi visual dan konfirmasi uji statistik ini diharapkan dapat
+menghasilkan <em>insight</em> holistik terkait strategi harga yang
+rasional di industri penyewaan film.</p>
+</div>
+</div>
+<div id="deskripsi-data" class="section level1">
+<h1>2. Deskripsi Data</h1>
+<p>Data yang digunakan dalam analisis ini merupakan data sekunder yang
+diekstraksi dari Database Sakila, sebuah sample database standar yang
+dikembangkan oleh MySQL. Database ini merepresentasikan skema relasional
+dari sebuah bisnis penyewaan DVD (film), yang mencakup data entitas
+operasional seperti inventaris, staf, pelanggan, dan transaksi
+penyewaan.</p>
+<p>Penarikan data difokuskan pada dua kelompok informasi utama untuk
+menjawab tujuan analisis, yaitu data rekapitulasi penjualan per kategori
+film (menggunakan tabel <em>sales_by_film_category</em>) serta data
+spesifikasi fisik dan harga sewa film (bersumber dari tabel
+<em>film_list</em>).</p>
+<p>Terdapat empat variabel utama yang diamati dan dianalisis dalam studi
+ini. Untuk keperluan visualisasi data, data yang dimanfaatkan berasal
+dari tabel <em>sales_by_film_category</em> khususnya variabel
+<em>category</em> (kategori) dan <em>total sales</em> (total penjualan).
+Variabel <em>category</em> sendiri merupakan pengelompokan genre film
+yang tersedia di toko penyewaan. Terdapat 16 kategori unik dalam
+database ini, di antaranya <em>Action, Animation, Children, Classics,
+Comedy, Documentary, Drama, Family, Foreign, Games, Horror, Music, New,
+Sci-Fi, Sports,</em> dan <em>Travel</em>. Adapun <em>total sales</em>
+berisi akumulasi nilai transaksi pembayaran (dalam satuan mata uang USD)
+yang berhasil dibukukan oleh masing-masing kategori film dari seluruh
+riwayat peminjaman pelanggan.</p>
+<p>Untuk kebutuhan analisis statistik ineferensial, digunakan tabel
+<em>film_list</em>. Variabel yang diambil dari tabel tersebut meliputi
+<em>price</em> (tarif sewa) yang bersifat tetap dan terbagi ke dalam
+tiga tingkatan <em>(tier)</em> nominal unik, yaitu 0.99 USD, 2.99 USD,
+dan 4.99 USD. Variabel ini kemudian dibandingkan dengan variabel
+<em>length</em> (durasi film) yang diukur dalam satuan menit.</p>
+</div>
+<div id="manajemen-eksplorasi-dan-visualisasi-data"
+class="section level1">
+<h1>3. Manajemen, Eksplorasi, dan Visualisasi Data</h1>
+<p>Sebelum melakukan manajemen, eksplorasi, hingga visualisasi data,
+dilakukan koneksi terlebih dahulu antara R dengan dataset sakila yang
+sudah tersedia di MySQL.</p>
+<pre class="r"><code>library(DBI)
+library(odbc)
+
+connection1 &lt;- dbConnect(odbc(),
+          Driver = &quot;MySQL ODBC 8.0 ANSI Driver&quot;,
+          Server = &quot;127.0.0.1&quot;,
+          Database = &quot;sakila&quot;,
+          UID = &quot;root&quot;,
+          PWD = &quot;listiana121206&quot;,
+          Port = 3306)</code></pre>
+<div id="eksplorasi-data" class="section level2">
+<h2>Eksplorasi Data</h2>
+<p>Selanjutnya, dapat dilakukan eksplorasi pada database sakila yang
+sudah terhubung:</p>
+<div id="melihat-tabel-tabel-yang-terdapat-dalam-database-sakila"
+class="section level3">
+<h3>1. Melihat tabel-tabel yang terdapat dalam database sakila</h3>
+<pre class="r"><code>dbListTables(connection1)</code></pre>
+<pre><code>##  [1] &quot;actor&quot;                      &quot;actor_info&quot;                
+##  [3] &quot;address&quot;                    &quot;category&quot;                  
+##  [5] &quot;city&quot;                       &quot;country&quot;                   
+##  [7] &quot;customer&quot;                   &quot;customer_list&quot;             
+##  [9] &quot;film&quot;                       &quot;film_actor&quot;                
+## [11] &quot;film_category&quot;              &quot;film_list&quot;                 
+## [13] &quot;film_text&quot;                  &quot;inventory&quot;                 
+## [15] &quot;language&quot;                   &quot;nicer_but_slower_film_list&quot;
+## [17] &quot;payment&quot;                    &quot;rental&quot;                    
+## [19] &quot;sales_by_film_category&quot;     &quot;sales_by_store&quot;            
+## [21] &quot;staff&quot;                      &quot;staff_list&quot;                
+## [23] &quot;store&quot;</code></pre>
+<p>Terdapat 22 tabel yaitu <em>actor, actor_info, address, category,
+city, country,</em> dan seterusnya hingga tabel <em>store</em> seperti
+tertera pada <em>output</em> di atas.</p>
+</div>
+<div id="melihat-nama-atribut-pada-suatu-tabel" class="section level3">
+<h3>2. Melihat nama atribut pada suatu tabel</h3>
+<p>Misalkan kita ingin melihat nama atribut tabel <em>film_list</em></p>
+<pre class="r"><code>dbListFields(connection1, &quot;film_list&quot;)</code></pre>
+<pre><code>## [1] &quot;FID&quot;         &quot;title&quot;       &quot;description&quot; &quot;category&quot;    &quot;price&quot;      
+## [6] &quot;length&quot;      &quot;rating&quot;      &quot;actors&quot;</code></pre>
+</div>
+<div id="melihat-isi-tabel" class="section level3">
+<h3>3. Melihat Isi Tabel</h3>
+<p>Melihat isi tabel <em>category</em></p>
+<pre class="r"><code>dbReadTable(connection1, &quot;category&quot;)</code></pre>
+<pre><code>##    category_id        name         last_update
+## 1            1      Action 2006-02-15 04:46:27
+## 2            2   Animation 2006-02-15 04:46:27
+## 3            3    Children 2006-02-15 04:46:27
+## 4            4    Classics 2006-02-15 04:46:27
+## 5            5      Comedy 2006-02-15 04:46:27
+## 6            6 Documentary 2006-02-15 04:46:27
+## 7            7       Drama 2006-02-15 04:46:27
+## 8            8      Family 2006-02-15 04:46:27
+## 9            9     Foreign 2006-02-15 04:46:27
+## 10          10       Games 2006-02-15 04:46:27
+## 11          11      Horror 2006-02-15 04:46:27
+## 12          12       Music 2006-02-15 04:46:27
+## 13          13         New 2006-02-15 04:46:27
+## 14          14      Sci-Fi 2006-02-15 04:46:27
+## 15          15      Sports 2006-02-15 04:46:27
+## 16          16      Travel 2006-02-15 04:46:27</code></pre>
+</div>
+<div id="mengeksekusi-query-ddl-dan-dml-mysql" class="section level3">
+<h3>4. Mengeksekusi Query DDL dan DML MySQL</h3>
+<p>Memilih seluruh kolom pada tabel <em>country</em></p>
+<pre class="r"><code>dbGetQuery(connection1, &quot;SELECT * FROM country&quot;)</code></pre>
+<pre><code>##     country_id                               country         last_update
+## 1            1                           Afghanistan 2006-02-15 04:44:00
+## 2            2                               Algeria 2006-02-15 04:44:00
+## 3            3                        American Samoa 2006-02-15 04:44:00
+## 4            4                                Angola 2006-02-15 04:44:00
+## 5            5                              Anguilla 2006-02-15 04:44:00
+## 6            6                             Argentina 2006-02-15 04:44:00
+## 7            7                               Armenia 2006-02-15 04:44:00
+## 8            8                             Australia 2006-02-15 04:44:00
+## 9            9                               Austria 2006-02-15 04:44:00
+## 10          10                            Azerbaijan 2006-02-15 04:44:00
+## 11          11                               Bahrain 2006-02-15 04:44:00
+## 12          12                            Bangladesh 2006-02-15 04:44:00
+## 13          13                               Belarus 2006-02-15 04:44:00
+## 14          14                               Bolivia 2006-02-15 04:44:00
+## 15          15                                Brazil 2006-02-15 04:44:00
+## 16          16                                Brunei 2006-02-15 04:44:00
+## 17          17                              Bulgaria 2006-02-15 04:44:00
+## 18          18                              Cambodia 2006-02-15 04:44:00
+## 19          19                              Cameroon 2006-02-15 04:44:00
+## 20          20                                Canada 2006-02-15 04:44:00
+## 21          21                                  Chad 2006-02-15 04:44:00
+## 22          22                                 Chile 2006-02-15 04:44:00
+## 23          23                                 China 2006-02-15 04:44:00
+## 24          24                              Colombia 2006-02-15 04:44:00
+## 25          25 Congo, The Democratic Republic of the 2006-02-15 04:44:00
+## 26          26                        Czech Republic 2006-02-15 04:44:00
+## 27          27                    Dominican Republic 2006-02-15 04:44:00
+## 28          28                               Ecuador 2006-02-15 04:44:00
+## 29          29                                 Egypt 2006-02-15 04:44:00
+## 30          30                               Estonia 2006-02-15 04:44:00
+## 31          31                              Ethiopia 2006-02-15 04:44:00
+## 32          32                         Faroe Islands 2006-02-15 04:44:00
+## 33          33                               Finland 2006-02-15 04:44:00
+## 34          34                                France 2006-02-15 04:44:00
+## 35          35                         French Guiana 2006-02-15 04:44:00
+## 36          36                      French Polynesia 2006-02-15 04:44:00
+## 37          37                                Gambia 2006-02-15 04:44:00
+## 38          38                               Germany 2006-02-15 04:44:00
+## 39          39                                Greece 2006-02-15 04:44:00
+## 40          40                             Greenland 2006-02-15 04:44:00
+## 41          41         Holy See (Vatican City State) 2006-02-15 04:44:00
+## 42          42                             Hong Kong 2006-02-15 04:44:00
+## 43          43                               Hungary 2006-02-15 04:44:00
+## 44          44                                 India 2006-02-15 04:44:00
+## 45          45                             Indonesia 2006-02-15 04:44:00
+## 46          46                                  Iran 2006-02-15 04:44:00
+## 47          47                                  Iraq 2006-02-15 04:44:00
+## 48          48                                Israel 2006-02-15 04:44:00
+## 49          49                                 Italy 2006-02-15 04:44:00
+## 50          50                                 Japan 2006-02-15 04:44:00
+## 51          51                             Kazakstan 2006-02-15 04:44:00
+## 52          52                                 Kenya 2006-02-15 04:44:00
+## 53          53                                Kuwait 2006-02-15 04:44:00
+## 54          54                                Latvia 2006-02-15 04:44:00
+## 55          55                         Liechtenstein 2006-02-15 04:44:00
+## 56          56                             Lithuania 2006-02-15 04:44:00
+## 57          57                            Madagascar 2006-02-15 04:44:00
+## 58          58                                Malawi 2006-02-15 04:44:00
+## 59          59                              Malaysia 2006-02-15 04:44:00
+## 60          60                                Mexico 2006-02-15 04:44:00
+## 61          61                               Moldova 2006-02-15 04:44:00
+## 62          62                               Morocco 2006-02-15 04:44:00
+## 63          63                            Mozambique 2006-02-15 04:44:00
+## 64          64                               Myanmar 2006-02-15 04:44:00
+## 65          65                                 Nauru 2006-02-15 04:44:00
+## 66          66                                 Nepal 2006-02-15 04:44:00
+## 67          67                           Netherlands 2006-02-15 04:44:00
+## 68          68                           New Zealand 2006-02-15 04:44:00
+## 69          69                               Nigeria 2006-02-15 04:44:00
+## 70          70                           North Korea 2006-02-15 04:44:00
+## 71          71                                  Oman 2006-02-15 04:44:00
+## 72          72                              Pakistan 2006-02-15 04:44:00
+## 73          73                              Paraguay 2006-02-15 04:44:00
+## 74          74                                  Peru 2006-02-15 04:44:00
+## 75          75                           Philippines 2006-02-15 04:44:00
+## 76          76                                Poland 2006-02-15 04:44:00
+## 77          77                           Puerto Rico 2006-02-15 04:44:00
+## 78          78                               Romania 2006-02-15 04:44:00
+## 79          79                               Réunion 2006-02-15 04:44:00
+## 80          80                    Russian Federation 2006-02-15 04:44:00
+## 81          81      Saint Vincent and the Grenadines 2006-02-15 04:44:00
+## 82          82                          Saudi Arabia 2006-02-15 04:44:00
+## 83          83                               Senegal 2006-02-15 04:44:00
+## 84          84                              Slovakia 2006-02-15 04:44:00
+## 85          85                          South Africa 2006-02-15 04:44:00
+## 86          86                           South Korea 2006-02-15 04:44:00
+## 87          87                                 Spain 2006-02-15 04:44:00
+## 88          88                             Sri Lanka 2006-02-15 04:44:00
+## 89          89                                 Sudan 2006-02-15 04:44:00
+## 90          90                                Sweden 2006-02-15 04:44:00
+## 91          91                           Switzerland 2006-02-15 04:44:00
+## 92          92                                Taiwan 2006-02-15 04:44:00
+## 93          93                              Tanzania 2006-02-15 04:44:00
+## 94          94                              Thailand 2006-02-15 04:44:00
+## 95          95                                 Tonga 2006-02-15 04:44:00
+## 96          96                               Tunisia 2006-02-15 04:44:00
+## 97          97                                Turkey 2006-02-15 04:44:00
+## 98          98                          Turkmenistan 2006-02-15 04:44:00
+## 99          99                                Tuvalu 2006-02-15 04:44:00
+## 100        100                               Ukraine 2006-02-15 04:44:00
+## 101        101                  United Arab Emirates 2006-02-15 04:44:00
+## 102        102                        United Kingdom 2006-02-15 04:44:00
+## 103        103                         United States 2006-02-15 04:44:00
+## 104        104                             Venezuela 2006-02-15 04:44:00
+## 105        105                               Vietnam 2006-02-15 04:44:00
+## 106        106                  Virgin Islands, U.S. 2006-02-15 04:44:00
+## 107        107                                 Yemen 2006-02-15 04:44:00
+## 108        108                            Yugoslavia 2006-02-15 04:44:00
+## 109        109                                Zambia 2006-02-15 04:44:00</code></pre>
+</div>
+<div id="menyimpan-hasil-manajemen-data-dalam-bentuk-objek-r"
+class="section level3">
+<h3>5. Menyimpan Hasil Manajemen data dalam bentuk objek R</h3>
+<p>Menyimpan seluruh isi tabel <em>store</em> dan menyimpannya di R
+dalam tipe data frame</p>
+<pre class="r"><code>df_store &lt;- dbGetQuery(connection1, &quot;SELECT * FROM store&quot;)
+View(df_store)</code></pre>
+</div>
+</div>
+<div id="visualisasi-data" class="section level2">
+<h2>Visualisasi Data</h2>
+<p>Akan dibuat bar chart yang memvisualisasikan total penjualan
+<em>(sales)</em> DVD yang dikelompokkan berdasarkan kategori genre film.
+Data diambil dari tabel <em>sales_by_film_category</em>
+Langkah-langkahnya sebagai berikut:</p>
+<p>Pertama, memfilter data yang akan divisualisasikan dan menyimpannya
+dalam objek bernama kategori_film.</p>
+<pre class="r"><code>kategori_film &lt;- dbGetQuery(connection1, &quot;SELECT * FROM sales_by_film_category&quot;)
+kategori_film</code></pre>
+<pre><code>##       category total_sales
+## 1       Sports     5314.21
+## 2       Sci-Fi     4756.98
+## 3    Animation     4656.30
+## 4        Drama     4587.39
+## 5       Comedy     4383.58
+## 6       Action     4375.85
+## 7          New     4351.62
+## 8        Games     4281.33
+## 9      Foreign     4270.67
+## 10      Family     4226.07
+## 11 Documentary     4217.52
+## 12      Horror     3722.54
+## 13    Children     3655.55
+## 14    Classics     3639.59
+## 15      Travel     3549.64
+## 16       Music     3417.72</code></pre>
+<p>Lalu, membuat <em>bar chart</em> dan menyimpannya dengan nama
+bar_sakila.</p>
+<pre class="r"><code>library(ggplot2)
+bar_sakila &lt;- ggplot(kategori_film, aes(x= `category`,y=total_sales)) + 
+  geom_bar(stat=&quot;identity&quot;, fill=&quot;goldenrod&quot;, alpha=0.8) +
+  theme_minimal() +
+  labs(title=&quot;Total Penjualan DVD Berdasarkan Kategori&quot;, x =&quot;Kategori&quot;, y= &quot;Total Penjualan&quot;) +
+  theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1), 
+        plot.title = element_text(hjust=0.5, color=&quot;black&quot;))
+  
+bar_sakila</code></pre>
+<p><img src="TUGAS_ANALISIS_SAKILA_files/figure-html/bar%20chart-1.png" width="672" /></p>
+</div>
+</div>
+<div id="analisis-data" class="section level1">
+<h1>4. ANALISIS DATA</h1>
+<p>Sebelum melakukan analisis data, perlu dicek apakah terdapat data
+yang kosong <em>(missing value)</em>. Hal ini bertujuan agar jika
+benar-benar ada data kosong, bisa dilakukan penanganan pada data
+tersebut.</p>
+<pre class="r"><code>film_list &lt;- dbGetQuery(connection1, &quot;SELECT * FROM film_list&quot;)
+colSums(is.na(film_list))</code></pre>
+<pre><code>##         FID       title description    category       price      length 
+##           0           0           0           0           0           0 
+##      rating      actors 
+##           0           0</code></pre>
+<p>Dapat dilihat bahwa dalam tabel <em>film_list</em> tidak terdapat
+kolom yang mengandung <em>missing value</em>. Maka tanpa dilakukan
+penanganan apapun, kolom-kolom dalam tabel tersebut dapat langsung
+dieksplorasi atau dilakukan analisis.</p>
+<div id="analisis-komparatif-durasi-film-antar-kelompok-harga"
+class="section level3">
+<h3>Analisis Komparatif Durasi Film Antar Kelompok Harga</h3>
+<p>Apabila diamati lebih cermat, harga tarif DVD secara keseuluruhan
+dikelompokkan menjadi 3 nominal harga yaitu 0.99, 2.99, dan 4.99. Di
+sini kita akan menguji apakah terdapat perbedaan rata-rata durasi film
+<em>(length)</em> yang signifikan di antara ketiga kelompok tarif sewa
+tersebut.</p>
+<p>Untuk melakukan analisis antara 2 sampel atau lebih menggunakan uji
+statistik parametrik maupun non parametrik, penting untuk memeriksa
+apakah data berdistribusi normal atau tidak. Jika berdistribusi normal,
+maka uji yang digunakan adalah statistika parametrik. Jika tidak
+berdistribusi normal, maka gunakan statistika non parametrik.</p>
+<p>Dikarenakan jumlah sampel (n) kurang dari 5000, maka uji normalitas
+yang digunakan adalah Shapiro Wilk (shapiro.test()).</p>
+<div id="uji-normalitas-variabel-harga-price-dan-durasi-length"
+class="section level4">
+<h4>Uji Normalitas Variabel Harga (Price) dan Durasi (Length)</h4>
+<p>H0: Data berdistribusi normal</p>
+<p>H1: Data tidak berdistribusi normal</p>
+<p>Taraf signifikansi = 0.05</p>
+<pre class="r"><code>film_list$price &lt;- as.numeric(film_list$price)
+shapiro.test(film_list$price)</code></pre>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  film_list$price
+## W = 0.79074, p-value &lt; 2.2e-16</code></pre>
+<p>Karena <em>p-value</em> kurang dari 0.05, maka H0 ditolak yang
+berarti data harga <em>(price)</em> tidak berdistribusi normal.</p>
+<p>Selanjutnya, dilakukan uji normalitas variabel <em>length</em>.</p>
+<pre class="r"><code>shapiro.test(film_list$length)</code></pre>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  film_list$length
+## W = 0.95617, p-value &lt; 2.2e-16</code></pre>
+<p>Karena <em>p-value</em> kurang dari 0.05, maka H0 ditolak yang
+berarti data <em>length</em> tidak berdistribusi normal.</p>
+</div>
+<div id="uji-hipotesis-non-parametrik-tarif-sewa-dan-durasi-film-length"
+class="section level4">
+<h4>Uji Hipotesis Non Parametrik Tarif Sewa dan Durasi Film
+(length)</h4>
+<p>Karena kedua variabel di atas tidak berdistribusi normal, maka
+digunakan uji non parametrik lebih tepatnya uji Kruskal-Wallis.</p>
+<p>H0: Tidak terdapat perbedaan durasi yang signifikan antara ketiga
+tarif</p>
+<p>H1: Terdapat perbedaan durasi yang signifikan antara ketiga tarif</p>
+<pre class="r"><code>film_list$price &lt;- as.factor(film_list$price)
+kruskal.test(length~ price,data= film_list)</code></pre>
+<pre><code>## 
+##  Kruskal-Wallis rank sum test
+## 
+## data:  length by price
+## Kruskal-Wallis chi-squared = 1.9147, df = 2, p-value = 0.3839</code></pre>
+<p>Karena <em>p-value</em> lebih dari 0.05, maka gagal menolak H0 yang
+berarti tidak terdapat perbedaan signifikan antara ketiga kelompok harga
+dalam hal durasi tayang film.</p>
+</div>
+<div id="uji-korelasi-linear-tarif-sewa-dan-durasi-film-length"
+class="section level4">
+<h4>Uji Korelasi Linear Tarif Sewa dan Durasi Film (length)</h4>
+<p>Selanjutnya, akan diuji apakah durasi film berpengaruh terhadap harga
+sewa. Maka metode yang tepat digunakan untuk kasus ini adalah uji
+korelasi Spearman.</p>
+<p>H0: Tidak terdapat hubungan signifikan antara durasi dan tarif</p>
+<p>H1: Terdapat hubungan signifikan antara durasi dan tarif</p>
+<pre class="r"><code>film_list$price &lt;- as.numeric(film_list$price)
+cor.test(film_list$length, film_list$price, method = &quot;spearman&quot;)</code></pre>
+<pre><code>## Warning in cor.test.default(film_list$length, film_list$price, method =
+## &quot;spearman&quot;): Cannot compute exact p-value with ties</code></pre>
+<pre><code>## 
+##  Spearman&#39;s rank correlation rho
+## 
+## data:  film_list$length and film_list$price
+## S = 160754767, p-value = 0.399
+## alternative hypothesis: true rho is not equal to 0
+## sample estimates:
+##        rho 
+## 0.02673732</code></pre>
+<p>Karena <em>p-value</em> lebih dari 0.05, maka gagal menolak H0 yang
+berarti tidak terdapat korelasi atau hubungan signifikan antara durasi
+film dan tarif sewa DVD.</p>
+</div>
+</div>
+</div>
+<div id="interpretasi-dan-kesimpulan" class="section level1">
+<h1>5. Interpretasi dan Kesimpulan</h1>
+<div id="bar-chart" class="section level2">
+<h2>Bar Chart</h2>
+<p>Pada visualisasi berupa diagram batang ditampilkan performa penjualan
+<em>(sales)</em> dari tiap-tiap kategori film. Diagram tersebut
+memperlihatkan bahwa produk DVD dengan kategori <em>sports</em> atau
+olahraga memiliki total penjualan terbesar mencapai lebih dari 5000 USD.
+Di sisi lain, kategori musik yang selama ini berkaitan erat dengan
+konten DVD justru menunjukkan performa penjualan terendah.</p>
+</div>
+<div id="analisis-komparatif-durasi-film-antar-kelompok-harga-1"
+class="section level2">
+<h2>Analisis Komparatif Durasi Film Antar Kelompok Harga</h2>
+<p>Dari analisis menggunakan uji Kruskal-Wallis antara variabel 3
+kelompok harga dan durasi <em>(length)</em>, didapatkan hasil yang
+menunjukkan bahwa tidak terdapat perbedaan durasi yang signifikan antara
+ketiga tingkatan harga ($0.99, $2.99, dan $4.99. Itu artinya panjang
+pendeknya durasi tayang sebuah film tidak menjadi faktor penentu bagi
+tinggi rendahnya tarif sewa yang dikenakan. Perusahaan mungkin perlu
+mempertimbangkan variabel lain di luar durasi fisik seperti tingkat
+popularitas film, tahun rilis (kategori film baru vs klasik), atau tren
+permintaan pasar terhadap genre tertentu—sebagai dasar yang lebih
+relevan dalam merumuskan strategi penetapan harga sewa ke depannya .</p>
+</div>
+<div id="analisis-pengaruh-durasi-film-terhadap-tarif"
+class="section level2">
+<h2>Analisis Pengaruh Durasi Film terhadap Tarif</h2>
+<p>Hasil uji korelasi Spearman memperlihatkan tidak adanya hubungan yang
+signifikan antara durasi konten DVD dengan tarif yang dikenakan. Ini
+dapat diartikan bahwasanya perubahan atau peningkatan durasi tayang film
+tidak diikuti oleh pola kenaikan atau penurunan tarif sewa secara
+konsisten (monoton). Dengan kata lain, kecenderungan sebuah film untuk
+ditempatkan pada kelompok harga sewa yang lebih tinggi tidak memiliki
+hubungan asosiatif dengan lama atau sebentarnya durasi film tersebut di
+layar.</p>
+</div>
+<div id="kesimpulan" class="section level2">
+<h2>Kesimpulan</h2>
+<p>Berdasarkan analisis data pada database Sakila, ditemukan bahwa genre
+<em>Sports</em> tampil sebagai kontributor pendapatan tertinggi dengan
+total penjualan melampaui 5.000 USD, sementara kategori <em>Music</em>
+mencatatkan performa penjualan terendah. Lebih lanjut, pengujian
+inferensial melalui uji Kruskal-Wallis dan korelasi Spearman secara
+konsisten membuktikan bahwa karakteristik fisik berupa durasi tayang
+film tidak memiliki hubungan atau pengaruh signifikan terhadap tingkatan
+tarif sewa yang ditetapkan. Oleh karena itu, pihak manajemen
+direkomendasikan untuk tidak lagi mengandalkan dimensi durasi produk
+dalam merumuskan skema harga, melainkan beralih pada metrik operasional
+lain yang lebih sensitif terhadap pasar seperti tingkat popularitas
+konten, tren permintaan genre, atau status kebaruan rilis film.</p>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
